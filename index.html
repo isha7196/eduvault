@@ -1,0 +1,1952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduVault - Secure Exam Management System</title>
+    <meta name="description" content="Secure exam management system for teachers to create and manage question papers with advanced customization">
+    <meta name="keywords" content="exam management, question paper generator, teacher tools, education technology, secure exam system">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        :root {
+            --primary: #6C757D;
+            --secondary: #495057;
+            --accent: #8D99AE;
+            --light: #f8f9fa;
+            --dark: #2D2B3A;
+            --success: #36D9B0;
+            --warning: #FFC107;
+            --danger: #FF5252;
+            --gray: #8C8A9D;
+            --border-radius: 12px;
+            --shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+            --background: #F8FAFF;
+            --card-bg: #FFFFFF;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--dark);
+            line-height: 1.6;
+            transition: var(--transition);
+        }
+
+        body.dark-mode {
+            --background: #1E1E2E;
+            --card-bg: #2A2A3C;
+            --dark: #F1F1F1;
+            --gray: #A5A5B5;
+            --light: #252536;
+            --shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Auth Screens */
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            padding: 20px;
+        }
+
+        .auth-box {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .auth-logo {
+            margin-bottom: 30px;
+        }
+
+        .auth-logo h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .auth-logo p {
+            color: var(--gray);
+            font-size: 1rem;
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 15px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+            color: var(--gray);
+        }
+
+        .auth-tab.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+            background: var(--card-bg);
+            color: var(--dark);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(108, 117, 125, 0.2);
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            background-color: var(--card-bg);
+            color: var(--dark);
+        }
+
+        .btn {
+            padding: 14px 24px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(108, 117, 125, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success) 0%, #2AB598 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger) 0%, #E04444 100%);
+            color: white;
+        }
+
+        .password-strength {
+            height: 5px;
+            margin-top: 8px;
+            border-radius: 5px;
+            background: #eee;
+            overflow: hidden;
+        }
+
+        .password-strength-bar {
+            height: 100%;
+            width: 0;
+            transition: width 0.3s ease;
+        }
+
+        .password-strength-weak {
+            background: var(--danger);
+        }
+
+        .password-strength-medium {
+            background: var(--warning);
+        }
+
+        .password-strength-strong {
+            background: var(--success);
+        }
+
+        .password-feedback {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            color: var(--gray);
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px 0;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            position: relative;
+            z-index: 10;
+        }
+
+        .logo {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #ffffff 0%, #ADB5BD 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo p {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 5px;
+        }
+
+        .nav-links {
+            margin-top: 30px;
+            max-height: calc(100vh - 150px);
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: var(--transition);
+            border-left: 4px solid transparent;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid var(--accent);
+        }
+
+        .nav-item i {
+            margin-right: 15px;
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .theme-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+
+        .theme-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--secondary);
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--dark);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(30px);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info img {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary);
+        }
+
+        /* Card Styles */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 25px;
+            margin-bottom: 25px;
+            transition: var(--transition);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        /* Table Styles */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th, .table td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .table th {
+            background-color: rgba(108, 117, 125, 0.1);
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .table tr:hover {
+            background-color: rgba(108, 117, 125, 0.05);
+        }
+
+        /* Dashboard Stats */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--card-bg) 0%, #F1F3F5 100%);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+
+        .stat-icon.primary {
+            background: linear-gradient(135deg, rgba(108, 117, 125, 0.2) 0%, rgba(108, 117, 125, 0.1) 100%);
+            color: var(--primary);
+        }
+
+        .stat-icon.success {
+            background: linear-gradient(135deg, rgba(54, 217, 176, 0.2) 0%, rgba(54, 217, 176, 0.1) 100%);
+            color: var(--success);
+        }
+
+        .stat-icon.warning {
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.2) 0%, rgba(255, 193, 7, 0.1) 100%);
+            color: var(--warning);
+        }
+
+        .stat-icon.danger {
+            background: linear-gradient(135deg, rgba(255, 82, 82, 0.2) 0%, rgba(255, 82, 82, 0.1) 100%);
+            color: var(--danger);
+        }
+
+        .stat-info h3 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+
+        .stat-info p {
+            color: var(--gray);
+            font-size: 0.95rem;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            
+            .nav-links {
+                display: flex;
+                overflow-x: auto;
+                margin-top: 15px;
+            }
+            
+            .nav-item {
+                padding: 15px;
+                white-space: nowrap;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .user-info {
+                margin-top: 15px;
+            }
+
+            .auth-box {
+                padding: 25px;
+            }
+
+            .auth-tab {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Content Sections */
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        /* Paper Preview */
+        .paper-preview {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-top: 30px;
+        }
+
+        .paper-header {
+            text-align: center;
+            margin-bottom: 30px;
+            page-break-inside: avoid;
+        }
+
+        .school-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            page-break-inside: avoid;
+        }
+
+        .school-logo {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .question-item {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed #eee;
+            page-break-inside: avoid;
+        }
+
+        /* Settings Panel */
+        .settings-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .setting-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+        }
+
+        /* Academy Name Editor */
+        .academy-editor {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .academy-name {
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+
+        .academy-name:hover {
+            background-color: rgba(108, 117, 125, 0.1);
+        }
+
+        .academy-input {
+            padding: 8px 15px;
+            border: 1px solid var(--primary);
+            border-radius: var(--border-radius);
+            font-size: 1.2rem;
+            text-align: center;
+            width: 300px;
+        }
+
+        /* Print Styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #paper-print, #paper-print * {
+                visibility: visible;
+            }
+            #paper-print {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                padding: 20px;
+            }
+            .question-item {
+                page-break-inside: avoid;
+            }
+        }
+
+        /* Bilingual question styling */
+        .bilingual-question {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .question-english, .question-urdu {
+            width: 48%;
+        }
+
+        .question-urdu {
+            direction: rtl;
+            text-align: right;
+            font-family: 'Jameel Noori Nastaleeq', 'Nafees', 'Urdu Naskh Asiatype', sans-serif;
+        }
+
+        /* Answer Key Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        /* Animation for counting */
+        @keyframes count {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .counting {
+            animation: count 0.5s ease forwards;
+        }
+
+        /* Custom Checkbox */
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Auth Container -->
+    <div id="auth-screen" class="auth-container">
+        <div class="auth-box">
+            <div class="auth-logo">
+                <h1>EduVault</h1>
+                <p>Secure Exam Management System</p>
+            </div>
+
+            <div class="auth-tabs">
+                <div class="auth-tab active" data-tab="login">Login</div>
+                <div class="auth-tab" data-tab="signup">Sign Up</div>
+            </div>
+
+            <!-- Login Form -->
+            <form class="auth-form active" id="login-form">
+                <div class="form-group">
+                    <input type="email" class="form-control" id="login-email" placeholder="Email Address" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" class="form-control" id="login-password" placeholder="Password" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    <i class="fas fa-lock-open"></i> Login to Dashboard
+                </button>
+            </form>
+
+            <!-- Sign Up Form -->
+            <form class="auth-form" id="signup-form">
+                <div class="form-group">
+                    <input type="text" class="form-control" id="signup-name" placeholder="Full Name" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" class="form-control" id="signup-email" placeholder="Email Address" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control" id="signup-subject" placeholder="Enter your subject (e.g. Mathematics)" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" class="form-control" id="signup-password" placeholder="Password" required>
+                    <div class="password-strength">
+                        <div class="password-strength-bar" id="password-strength-bar"></div>
+                    </div>
+                    <div class="password-feedback" id="password-feedback"></div>
+                </div>
+                <div class="form-group">
+                    <input type="password" class="form-control" id="signup-confirm-password" placeholder="Confirm Password" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    <i class="fas fa-user-plus"></i> Create Account
+                </button>
+            </form>
+
+            <p style="margin-top: 25px; color: var(--gray);">
+                <span id="auth-switch-text">Don't have an account?</span> 
+                <a href="#" id="auth-switch-link" style="color: var(--primary);">Sign Up</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Answer Key Modal -->
+    <div id="answer-key-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="close-modal">&times;</span>
+            <h2>Answer Key</h2>
+            <div id="answer-key-content">
+                <!-- Answer key content will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application (Initially Hidden) -->
+    <div class="container" style="display: none;">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <h1>EduVault</h1>
+                <p>Exam Management System</p>
+            </div>
+            <div class="nav-links">
+                <div class="nav-item active" data-target="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item" data-target="manage-questions">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Manage Questions</span>
+                </div>
+                <div class="nav-item" data-target="generate-paper">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Generate Paper</span>
+                </div>
+                <div class="nav-item" data-target="papers">
+                    <i class="fas fa-book"></i>
+                    <span>Previous Papers</span>
+                </div>
+                <div class="nav-item" data-target="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </div>
+                <div class="nav-item" id="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h2>Teacher Dashboard</h2>
+                <div class="header-actions">
+                    <label class="theme-switch">
+                        <input type="checkbox" id="theme-toggle">
+                        <span class="slider"></span>
+                    </label>
+                    <div class="user-info">
+                        <img src="https://ui-avatars.com/api/?name=Teacher+User&background=6C757D&color=fff" alt="User" id="user-avatar">
+                        <div>
+                            <h4 id="teacher-name">Teacher Name</h4>
+                            <p id="teacher-subject">Subject Department</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Section -->
+            <div id="dashboard" class="content-section active">
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-icon primary">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="questions-count">0</h3>
+                            <p>Total Questions</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon success">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="papers-count">0</h3>
+                            <p>Generated Papers</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon warning">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="teachers-count">0</h3>
+                            <p>Active Teachers</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon danger">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="subjects-count">0</h3>
+                            <p>Subjects</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Recent Activity</h3>
+                        <button class="btn btn-primary">View All</button>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Activity</th>
+                                <th>Subject</th>
+                                <th>User</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activity-table">
+                            <tr>
+                                <td colspan="4" style="text-align: center;">No activities yet</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Manage Questions Section -->
+            <div id="manage-questions" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Add New Question</h3>
+                    </div>
+                    <form id="question-form">
+                        <div class="form-group">
+                            <label class="form-label">Subject</label>
+                            <input type="text" class="form-control" id="question-subject" placeholder="Enter subject (e.g. Mathematics)">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Question Type</label>
+                            <select class="form-select" id="question-type">
+                                <option value="">Select Type</option>
+                                <option value="mcq">Multiple Choice (MCQ)</option>
+                                <option value="short">Short Question</option>
+                                <option value="essay">Essay Question</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Language</label>
+                            <select class="form-select" id="question-language">
+                                <option value="english">English</option>
+                                <option value="urdu">Urdu</option>
+                                <option value="bilingual">Bilingual (English + Urdu)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Question Text (English)</label>
+                            <textarea class="form-control" id="question-text-en" rows="3" placeholder="Enter question text in English"></textarea>
+                        </div>
+                        <div class="form-group" id="urdu-question-container" style="display: none;">
+                            <label class="form-label">Question Text (Urdu)</label>
+                            <textarea class="form-control" id="question-text-urdu" rows="3" placeholder="Enter question text in Urdu" style="direction: rtl; font-family: 'Jameel Noori Nastaleeq', 'Nafees', 'Urdu Naskh Asiatype', sans-serif;"></textarea>
+                        </div>
+                        <div class="form-group" id="mcq-options-container" style="display: none;">
+                            <label class="form-label">Options (Separate with comma)</label>
+                            <input type="text" class="form-control" id="question-options" placeholder="Option 1, Option 2, Option 3, Option 4">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Marks</label>
+                            <input type="number" class="form-control" id="question-marks" placeholder="Enter marks">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Chapter/Topic</label>
+                            <input type="text" class="form-control" id="question-chapter" placeholder="Enter chapter or topic">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Answer</label>
+                            <textarea class="form-control" id="question-answer" rows="3" placeholder="Enter the answer"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Question</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Question Bank</h3>
+                        <div>
+                            <input type="text" class="form-control" placeholder="Search questions" style="width: 200px; display: inline-block;">
+                        </div>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Question</th>
+                                <th>Type</th>
+                                <th>Subject</th>
+                                <th>Marks</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="question-bank-body">
+                            <tr>
+                                <td colspan="6" style="text-align: center;">No questions added yet</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Generate Paper Section -->
+            <div id="generate-paper" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Generate New Paper</h3>
+                    </div>
+                    <form id="paper-form">
+                        <div class="form-group">
+                            <label class="form-label">Paper Title</label>
+                            <input type="text" class="form-control" id="paper-title-input" placeholder="e.g., Midterm Examination 2023">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Subject</label>
+                            <input type="text" class="form-control" id="paper-subject-input" placeholder="Enter subject (e.g. Mathematics)">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Language</label>
+                            <select class="form-select" id="paper-language">
+                                <option value="english">English</option>
+                                <option value="urdu">Urdu</option>
+                                <option value="bilingual">Bilingual (English + Urdu)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Syllabus Coverage</label>
+                            <select class="form-select" id="paper-coverage">
+                                <option value="full">Full Book</option>
+                                <option value="half">Half Book</option>
+                                <option value="custom">Custom Chapters</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="chapters-container" style="display: none;">
+                            <label class="form-label">Select Chapters (if custom)</label>
+                            <div>
+                                <label style="margin-right: 15px;"><input type="checkbox" name="chapter" value="1"> Chapter 1</label>
+                                <label style="margin-right: 15px;"><input type="checkbox" name="chapter" value="2"> Chapter 2</label>
+                                <label style="margin-right: 15px;"><input type="checkbox" name="chapter" value="3"> Chapter 3</label>
+                                <label style="margin-right: 15px;"><input type="checkbox" name="chapter" value="4"> Chapter 4</label>
+                                <label style="margin-right: 15px;"><input type="checkbox" name="chapter" value="5"> Chapter 5</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Total Marks</label>
+                            <input type="number" class="form-control" id="paper-marks" placeholder="Enter total marks">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Time Allowed</label>
+                            <input type="text" class="form-control" id="paper-time" placeholder="e.g., 3 hours">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Instructions</label>
+                            <textarea class="form-control" id="paper-instructions" rows="3" placeholder="Enter paper instructions"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Generate Paper</button>
+                    </form>
+                </div>
+
+                <div class="paper-preview" id="paper-preview">
+                    <div class="academy-editor">
+                        <h2 class="academy-name" id="academy-name">Prestige Academy</h2>
+                        <input type="text" class="academy-input" id="academy-input" style="display: none;" value="Prestige Academy">
+                        <button class="btn btn-primary btn-sm" id="edit-academy" style="display: none;">Save</button>
+                    </div>
+                    
+                    <!-- Printable version of the paper (hidden by default) -->
+                    <div id="paper-print" style="display: none;">
+                        <div class="paper-header">
+                            <div class="school-info">
+                                <div class="school-logo">
+                                    <i class="fas fa-school"></i>
+                                </div>
+                                <div>
+                                    <h2 id="print-academy-name">Prestige Academy</h2>
+                                    <p>Excellence in Education Since 1995</p>
+                                </div>
+                                <div class="school-logo">
+                                    <i class="fas fa-graduation-cap"></i>
+                                </div>
+                            </div>
+                            <h3 id="print-paper-title">Midterm Examination 2023</h3>
+                            <p id="print-paper-subject">Subject: Mathematics</p>
+                            <p id="print-paper-details">Time Allowed: 3 hours | Total Marks: 100</p>
+                            <p id="print-paper-instructions" style="font-style: italic; margin-top: 15px;"></p>
+                        </div>
+
+                        <div id="print-questions-container">
+                            <!-- Questions will be inserted here by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <!-- Visible preview version -->
+                    <div class="paper-header">
+                        <div class="school-info">
+                            <div class="school-logo">
+                                <i class="fas fa-school"></i>
+                            </div>
+                            <div>
+                                <h2 id="academy-name-display">Prestige Academy</h2>
+                                <p>Excellence in Education Since 1995</p>
+                            </div>
+                            <div class="school-logo">
+                                <i class="fas fa-graduation-cap"></i>
+                            </div>
+                        </div>
+                        <h3 id="paper-title">Midterm Examination 2023</h3>
+                        <p id="paper-subject">Subject: Mathematics</p>
+                        <p id="paper-details">Time Allowed: 3 hours | Total Marks: 100</p>
+                        <p id="paper-instructions-display" style="font-style: italic; margin-top: 15px;"></p>
+                    </div>
+
+                    <div id="questions-container">
+                        <!-- Questions will be inserted here by JavaScript -->
+                    </div>
+
+                    <div style="margin-top: 30px; text-align: center;">
+                        <button class="btn btn-primary" id="download-pdf"><i class="fas fa-download"></i> Download PDF</button>
+                        <button class="btn btn-success" id="print-paper-btn"><i class="fas fa-print"></i> Print Paper</button>
+                        <button class="btn btn-primary" id="generate-key"><i class="fas fa-key"></i> Generate Answer Key</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Section -->
+            <div id="settings" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Account Settings</h3>
+                    </div>
+                    <div class="settings-panel">
+                        <div class="setting-card">
+                            <h4 style="margin-bottom: 20px; color: var(--primary);">Profile Information</h4>
+                            <div class="form-group">
+                                <label class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="profile-name" value="Teacher Name">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="profile-email" value="teacher@example.com">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Department</label>
+                                <input type="text" class="form-control" id="profile-subject" value="Subject Department">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" value="+1 (555) 123-4567">
+                            </div>
+                            <button class="btn btn-primary">Update Profile</button>
+                        </div>
+
+                        <div class="setting-card">
+                            <h4 style="margin-bottom: 20px; color: var(--primary);">Security Settings</h4>
+                            <div class="form-group">
+                                <label class="form-label">Current Password</label>
+                                <input type="password" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">New Password</label>
+                                <input type="password" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Confirm New Password</label>
+                                <input type="password" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Change Login Email</label>
+                                <input type="email" class="form-control" placeholder="Enter new email">
+                            </div>
+                            <div class="checkbox-container">
+                                <input type="checkbox" id="twofa">
+                                <label for="twofa">Enable Two-Factor Authentication</label>
+                            </div>
+                            <button class="btn btn-primary">Update Security Settings</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Application Settings</h3>
+                    </div>
+                    <div class="settings-panel">
+                        <div class="setting-card">
+                            <h4 style="margin-bottom: 20px; color: var(--primary);">Appearance</h4>
+                            <div class="form-group">
+                                <label class="form-label">Theme</label>
+                                <select class="form-select" id="theme-select">
+                                    <option value="light">Light Theme</option>
+                                    <option value="dark">Dark Theme</option>
+                                    <option value="auto">Auto (System Preference)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Font Size</label>
+                                <select class="form-select">
+                                    <option value="small">Small</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="large">Large</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-primary">Save Appearance Settings</button>
+                        </div>
+
+                        <div class="setting-card">
+                            <h4 style="margin-bottom: 20px; color: var(--primary);">Paper Generation</h4>
+                            <div class="form-group">
+                                <label class="form-label">Default Marks</label>
+                                <input type="number" class="form-control" value="100">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Default Time</label>
+                                <input type="text" class="form-control" value="3 hours">
+                            </div>
+                            <div class="checkbox-container">
+                                <input type="checkbox" id="auto-save" checked>
+                                <label for="auto-save">Auto-save generated papers</label>
+                            </div>
+                            <div class="checkbox-container">
+                                <input type="checkbox" id="answer-key" checked>
+                                <label for="answer-key">Auto-generate answer keys</label>
+                            </div>
+                            <button class="btn btn-primary">Save Paper Settings</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const authScreen = document.getElementById('auth-screen');
+        const mainApp = document.querySelector('.container');
+        const authTabs = document.querySelectorAll('.auth-tab');
+        const authForms = document.querySelectorAll('.auth-form');
+        const loginForm = document.getElementById('login-form');
+        const signupForm = document.getElementById('signup-form');
+        const authSwitchText = document.getElementById('auth-switch-text');
+        const authSwitchLink = document.getElementById('auth-switch-link');
+        const passwordStrengthBar = document.getElementById('password-strength-bar');
+        const passwordFeedback = document.getElementById('password-feedback');
+        const signupPassword = document.getElementById('signup-password');
+        const teacherName = document.getElementById('teacher-name');
+        const teacherSubject = document.getElementById('teacher-subject');
+        const userAvatar = document.getElementById('user-avatar');
+        const logoutBtn = document.getElementById('logout-btn');
+        const navItems = document.querySelectorAll('.nav-item');
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeSelect = document.getElementById('theme-select');
+        const questionForm = document.getElementById('question-form');
+        const paperForm = document.getElementById('paper-form');
+        const academyName = document.getElementById('academy-name');
+        const academyInput = document.getElementById('academy-input');
+        const editAcademy = document.getElementById('edit-academy');
+        const academyNameDisplay = document.getElementById('academy-name-display');
+        const downloadPdf = document.getElementById('download-pdf');
+        const printPaperBtn = document.getElementById('print-paper-btn');
+        const generateKeyBtn = document.getElementById('generate-key');
+        const paperTitle = document.getElementById('paper-title');
+        const questionLanguage = document.getElementById('question-language');
+        const urduQuestionContainer = document.getElementById('urdu-question-container');
+        const questionType = document.getElementById('question-type');
+        const mcqOptionsContainer = document.getElementById('mcq-options-container');
+        const paperCoverage = document.getElementById('paper-coverage');
+        const chaptersContainer = document.getElementById('chapters-container');
+        const questionsContainer = document.getElementById('questions-container');
+        const printQuestionsContainer = document.getElementById('print-questions-container');
+        const answerKeyModal = document.getElementById('answer-key-modal');
+        const closeModal = document.getElementById('close-modal');
+        const answerKeyContent = document.getElementById('answer-key-content');
+        const questionBankBody = document.getElementById('question-bank-body');
+        const profileName = document.getElementById('profile-name');
+        const profileEmail = document.getElementById('profile-email');
+        const profileSubject = document.getElementById('profile-subject');
+
+        // User accounts storage
+        let userAccounts = JSON.parse(localStorage.getItem('userAccounts')) || [];
+
+        // Initialize counters
+        let counters = {
+            questions: 0,
+            papers: 0,
+            teachers: 0,
+            subjects: 0
+        };
+
+        // Activity log
+        let activities = [];
+
+        // Question bank
+        let questionBank = [];
+
+        // Current user
+        let currentUser = null;
+
+        // Auth tab switching
+        authTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.getAttribute('data-tab');
+                
+                // Update active tab
+                authTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // Show correct form
+                authForms.forEach(form => {
+                    form.classList.remove('active');
+                    if (form.id === `${tabName}-form`) {
+                        form.classList.add('active');
+                    }
+                });
+                
+                // Update switch text and link
+                if (tabName === 'login') {
+                    authSwitchText.textContent = "Don't have an account?";
+                    authSwitchLink.textContent = "Sign Up";
+                } else {
+                    authSwitchText.textContent = "Already have an account?";
+                    authSwitchLink.textContent = "Login";
+                }
+            });
+        });
+
+        // Auth switch link
+        authSwitchLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            const currentTab = document.querySelector('.auth-tab.active').getAttribute('data-tab');
+            
+            if (currentTab === 'login') {
+                document.querySelector('[data-tab="signup"]').click();
+            } else {
+                document.querySelector('[data-tab="login"]').click();
+            }
+        });
+
+        // Password strength indicator
+        signupPassword.addEventListener('input', function() {
+            const password = this.value;
+            let strength = 0;
+            let feedback = '';
+            
+            // Check password strength
+            if (password.length > 0) {
+                // Length check
+                if (password.length < 6) {
+                    feedback = 'Password is too short';
+                } else {
+                    strength += 1;
+                }
+                
+                // Contains both lower and uppercase characters
+                if (password.match(/([a-z].*[A-Z])|([A-Z].*[a-z])/)) {
+                    strength += 1;
+                }
+                
+                // Contains numbers
+                if (password.match(/([0-9])/)) {
+                    strength += 1;
+                }
+                
+                // Contains special characters
+                if (password.match(/([!,@,#,$,%,^,&,*,?,_,~])/)) {
+                    strength += 1;
+                }
+                
+                // Update feedback text
+                if (strength === 0) {
+                    feedback = 'Password is too short';
+                } else if (strength === 1) {
+                    feedback = 'Weak password';
+                } else if (strength === 2) {
+                    feedback = 'Medium password';
+                } else if (strength === 3) {
+                    feedback = 'Strong password';
+                } else {
+                    feedback = 'Very strong password';
+                }
+                
+                // Update strength bar
+                const width = (strength / 4) * 100;
+                passwordStrengthBar.style.width = `${width}%`;
+                
+                // Update strength bar color
+                passwordStrengthBar.className = 'password-strength-bar';
+                if (strength < 2) {
+                    passwordStrengthBar.classList.add('password-strength-weak');
+                } else if (strength < 3) {
+                    passwordStrengthBar.classList.add('password-strength-medium');
+                } else {
+                    passwordStrengthBar.classList.add('password-strength-strong');
+                }
+            } else {
+                passwordStrengthBar.style.width = '0';
+                feedback = '';
+            }
+            
+            passwordFeedback.textContent = feedback;
+        });
+
+        // Sign up form submission
+        signupForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const name = document.getElementById('signup-name').value;
+            const email = document.getElementById('signup-email').value;
+            const subject = document.getElementById('signup-subject').value;
+            const password = document.getElementById('signup-password').value;
+            const confirmPassword = document.getElementById('signup-confirm-password').value;
+            
+            // Validate form
+            if (!name || !email || !subject || !password || !confirmPassword) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                alert('Passwords do not match');
+                return;
+            }
+            
+            if (password.length < 6) {
+                alert('Password must be at least 6 characters long');
+                return;
+            }
+            
+            // Check if email already exists
+            if (userAccounts.some(account => account.email === email)) {
+                alert('This email is already registered. Please login instead.');
+                return;
+            }
+            
+            // Create new account
+            const newAccount = {
+                name: name,
+                email: email,
+                subject: subject,
+                password: password
+            };
+            
+            // Save to accounts
+            userAccounts.push(newAccount);
+            localStorage.setItem('userAccounts', JSON.stringify(userAccounts));
+            
+            // Show success message and switch to login
+            alert('Account created successfully! Please login with your new account.');
+            document.querySelector('[data-tab="login"]').click();
+            
+            // Pre-fill login form
+            document.getElementById('login-email').value = email;
+            document.getElementById('login-password').value = password;
+        });
+
+        // Login form submission
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            // Validate form
+            if (!email || !password) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            // Check if user exists
+            const userAccount = userAccounts.find(account => account.email === email && account.password === password);
+            
+            if (userAccount) {
+                // Login successful
+                authScreen.style.display = 'none';
+                mainApp.style.display = 'flex';
+                
+                // Set user info
+                currentUser = userAccount;
+                teacherName.textContent = userAccount.name;
+                teacherSubject.textContent = userAccount.subject + " Department";
+                userAvatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(userAccount.name)}&background=6C757D&color=fff`;
+                
+                // Update profile settings
+                profileName.value = userAccount.name;
+                profileEmail.value = userAccount.email;
+                profileSubject.value = userAccount.subject;
+                
+                // Set default subject in forms
+                document.getElementById('question-subject').value = userAccount.subject;
+                document.getElementById('paper-subject-input').value = userAccount.subject;
+                
+                // Show success message
+                alert(`Login successful! Welcome to EduVault, ${userAccount.name}.`);
+                
+                // Initialize the dashboard
+                updateAllCounters();
+                updateActivityTable();
+                updateQuestionBank();
+                
+                // Load saved academy name if exists
+                const savedAcademyName = localStorage.getItem('academyName');
+                if (savedAcademyName) {
+                    academyName.textContent = savedAcademyName;
+                    academyNameDisplay.textContent = savedAcademyName;
+                    academyInput.value = savedAcademyName;
+                    document.getElementById('print-academy-name').textContent = savedAcademyName;
+                }
+                
+                // Generate initial paper questions
+                generatePaperQuestions('english');
+            } else {
+                alert('Invalid email or password. Please try again.');
+            }
+        });
+
+        // Update counter display with animation
+        function updateCounter(id, value) {
+            const element = document.getElementById(id);
+            element.textContent = value;
+            element.classList.add('counting');
+            setTimeout(() => element.classList.remove('counting'), 500);
+        }
+
+        // Update all counters
+        function updateAllCounters() {
+            updateCounter('questions-count', counters.questions);
+            updateCounter('papers-count', counters.papers);
+            updateCounter('teachers-count', userAccounts.length);
+            updateCounter('subjects-count', new Set(userAccounts.map(acc => acc.subject)).size);
+        }
+
+        // Add a new activity to the log
+        function addActivity(activity, subject) {
+            const now = new Date();
+            const dateString = now.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric',
+                year: 'numeric'
+            });
+            
+            activities.unshift({
+                date: dateString,
+                activity: activity,
+                subject: subject,
+                user: currentUser.name
+            });
+            
+            // Keep only the last 5 activities
+            if (activities.length > 5) {
+                activities.pop();
+            }
+            
+            updateActivityTable();
+        }
+
+        // Update the activity table
+        function updateActivityTable() {
+            const table = document.getElementById('activity-table');
+            
+            if (activities.length === 0) {
+                table.innerHTML = '<tr><td colspan="4" style="text-align: center;">No activities yet</td></tr>';
+                return;
+            }
+            
+            table.innerHTML = '';
+            activities.forEach(activity => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${activity.date}</td>
+                    <td>${activity.activity}</td>
+                    <td>${activity.subject}</td>
+                    <td>${activity.user}</td>
+                `;
+                table.appendChild(row);
+            });
+        }
+
+        // Update question bank table
+        function updateQuestionBank() {
+            if (questionBank.length === 0) {
+                questionBankBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No questions added yet</td></tr>';
+                return;
+            }
+            
+            questionBankBody.innerHTML = '';
+            questionBank.forEach((question, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${question.id}</td>
+                    <td>${question.textEn.substring(0, 50)}${question.textEn.length > 50 ? '...' : ''}</td>
+                    <td>${question.type}</td>
+                    <td>${question.subject}</td>
+                    <td>${question.marks}</td>
+                    <td>
+                        <button class="btn btn-primary"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-danger" onclick="deleteQuestion(${index})"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+                questionBankBody.appendChild(row);
+            });
+        }
+
+        // Delete question from bank
+        function deleteQuestion(index) {
+            if (confirm('Are you sure you want to delete this question?')) {
+                questionBank.splice(index, 1);
+                counters.questions--;
+                updateAllCounters();
+                updateQuestionBank();
+                addActivity('Deleted a question', currentUser.subject);
+            }
+        }
+
+        // Academy name editing
+        academyName.addEventListener('click', function() {
+            academyName.style.display = 'none';
+            academyInput.style.display = 'block';
+            editAcademy.style.display = 'block';
+            academyInput.focus();
+        });
+
+        editAcademy.addEventListener('click', function() {
+            const newName = academyInput.value.trim();
+            if (newName) {
+                academyName.textContent = newName;
+                academyNameDisplay.textContent = newName;
+                document.getElementById('print-academy-name').textContent = newName;
+                localStorage.setItem('academyName', newName);
+            }
+            
+            academyName.style.display = 'block';
+            academyInput.style.display = 'none';
+            editAcademy.style.display = 'none';
+        });
+
+        academyInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                editAcademy.click();
+            }
+        });
+
+        // Toggle Urdu question field based on language selection
+        questionLanguage.addEventListener('change', function() {
+            if (this.value === 'bilingual' || this.value === 'urdu') {
+                urduQuestionContainer.style.display = 'block';
+            } else {
+                urduQuestionContainer.style.display = 'none';
+            }
+        });
+
+        // Toggle MCQ options based on question type
+        questionType.addEventListener('change', function() {
+            if (this.value === 'mcq') {
+                mcqOptionsContainer.style.display = 'block';
+            } else {
+                mcqOptionsContainer.style.display = 'none';
+            }
+        });
+
+        // Toggle chapters selection based on syllabus coverage
+        paperCoverage.addEventListener('change', function() {
+            if (this.value === 'custom') {
+                chaptersContainer.style.display = 'block';
+            } else {
+                chaptersContainer.style.display = 'none';
+            }
+        });
+
+        // Generate questions for the paper
+        function generatePaperQuestions(language) {
+            questionsContainer.innerHTML = '';
+            printQuestionsContainer.innerHTML = '';
+            
+            questionBank.forEach((question, index) => {
+                // Only show questions for the current subject
+                if (question.subject !== currentUser.subject) return;
+                
+                const questionItem = document.createElement('div');
+                questionItem.className = 'question-item';
+                
+                if (language === 'bilingual') {
+                    questionItem.innerHTML = `
+                        <h4>Section ${String.fromCharCode(65 + index)} - ${question.type} Questions</h4>
+                        <div class="bilingual-question">
+                            <div class="question-english">
+                                <p><strong>Q${index + 1}.</strong> ${question.textEn} [${question.marks} Mark${question.marks > 1 ? 's' : ''}]</p>
+                                ${question.options ? `<p>${question.options.map((opt, i) => `${String.fromCharCode(97 + i)}) ${opt}`).join(' &nbsp;&nbsp; ')}</p>` : ''}
+                            </div>
+                            <div class="question-urdu">
+                                <p><strong>س${index + 1}.</strong> ${question.textUr || question.textEn} [${question.marks} نمبر]</p>
+                                ${question.options ? `<p>${question.options.map((opt, i) => `${String.fromCharCode(97 + i)}) ${opt}`).join(' &nbsp;&nbsp; ')}</p>` : ''}
+                            </div>
+                        </div>
+                    `;
+                } else if (language === 'urdu') {
+                    questionItem.innerHTML = `
+                        <h4>حصہ ${String.fromCharCode(65 + index)} - ${question.type} سوالات</h4>
+                        <p><strong>س${index + 1}.</strong> ${question.textUr || question.textEn} [${question.marks} نمبر]</p>
+                        ${question.options ? `<p>${question.options.map((opt, i) => `${String.fromCharCode(97 + i)}) ${opt}`).join(' &nbsp;&nbsp; ')}</p>` : ''}
+                    `;
+                } else {
+                    questionItem.innerHTML = `
+                        <h4>Section ${String.fromCharCode(65 + index)} - ${question.type} Questions</h4>
+                        <p><strong>Q${index + 1}.</strong> ${question.textEn} [${question.marks} Mark${question.marks > 1 ? 's' : ''}]</p>
+                        ${question.options ? `<p>${question.options.map((opt, i) => `${String.fromCharCode(97 + i)}) ${opt}`).join(' &nbsp;&nbsp; ')}</p>` : ''}
+                    `;
+                }
+                
+                questionsContainer.appendChild(questionItem);
+                
+                // Create a clone for the printable version
+                const printQuestionItem = questionItem.cloneNode(true);
+                printQuestionsContainer.appendChild(printQuestionItem);
+            });
+        }
+
+        // Generate answer key
+        function generateAnswerKey() {
+            answerKeyContent.innerHTML = '';
+            
+            const answerKeyTitle = document.createElement('h3');
+            answerKeyTitle.textContent = 'Answer Key';
+            answerKeyTitle.style.marginBottom = '20px';
+            answerKeyContent.appendChild(answerKeyTitle);
+            
+            questionBank.forEach((question, index) => {
+                // Only show answers for the current subject
+                if (question.subject !== currentUser.subject) return;
+                
+                const answerItem = document.createElement('div');
+                answerItem.className = 'question-item';
+                answerItem.innerHTML = `
+                    <p><strong>Q${index + 1}:</strong> ${question.textEn}</p>
+                    <p><strong>Answer:</strong> ${question.answer}</p>
+                    ${question.options ? `<p><strong>Options:</strong> ${question.options.join(', ')}</p>` : ''}
+                    <p><strong>Marks:</strong> ${question.marks}</p>
+                `;
+                
+                answerKeyContent.appendChild(answerItem);
+            });
+            
+            answerKeyModal.style.display = 'flex';
+        }
+
+        // PDF download functionality
+        downloadPdf.addEventListener('click', function() {
+            const paperElement = document.getElementById('paper-print');
+            paperElement.style.display = 'block';
+            
+            const options = {
+                margin: 10,
+                filename: 'exam-paper.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            
+            html2pdf().set(options).from(paperElement).save().then(() => {
+                paperElement.style.display = 'none';
+            });
+        });
+
+        // Print functionality
+        printPaperBtn.addEventListener('click', function() {
+            const paperElement = document.getElementById('paper-print');
+            paperElement.style.display = 'block';
+            
+            window.print();
+            
+            setTimeout(() => {
+                paperElement.style.display = 'none';
+            }, 500);
+        });
+
+        // Generate answer key functionality
+        generateKeyBtn.addEventListener('click', generateAnswerKey);
+
+        // Close modal functionality
+        closeModal.addEventListener('click', function() {
+            answerKeyModal.style.display = 'none';
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            if (event.target === answerKeyModal) {
+                answerKeyModal.style.display = 'none';
+            }
+        });
+
+        // Logout Functionality
+        logoutBtn.addEventListener('click', function() {
+            if (confirm('Are you sure you want to logout?')) {
+                mainApp.style.display = 'none';
+                authScreen.style.display = 'flex';
+                document.getElementById('login-email').value = '';
+                document.getElementById('login-password').value = '';
+            }
+        });
+
+        // Theme Toggle Functionality
+        themeToggle.addEventListener('change', function() {
+            if (this.checked) {
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.body.classList.remove('dark-mode');
+                localStorage.setItem('theme', 'light');
+            }
+        });
+
+        // Theme Select Functionality
+        if (themeSelect) {
+            themeSelect.addEventListener('change', function() {
+                if (this.value === 'dark') {
+                    document.body.classList.add('dark-mode');
+                    themeToggle.checked = true;
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                    themeToggle.checked = false;
+                    localStorage.setItem('theme', 'light');
+                }
+            });
+        }
+
+        // Check for saved theme preference
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+            if (themeToggle) themeToggle.checked = true;
+            if (themeSelect) themeSelect.value = 'dark';
+        }
+
+        // Navigation functionality
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                if (this.id !== 'logout-btn') {
+                    const target = this.getAttribute('data-target');
+                    if (target) {
+                        // Remove active class from all items
+                        document.querySelectorAll('.nav-item').forEach(navItem => {
+                            navItem.classList.remove('active');
+                        });
+                        
+                        // Add active class to clicked item
+                        this.classList.add('active');
+                        
+                        // Hide all content sections
+                        document.querySelectorAll('.content-section').forEach(section => {
+                            section.classList.remove('active');
+                        });
+                        
+                        // Show target section
+                        document.getElementById(target).classList.add('active');
+                    }
+                }
+            });
+        });
+
+        // Form submission handlers
+        questionForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const subject = document.getElementById('question-subject').value;
+            const type = document.getElementById('question-type').value;
+            const language = document.getElementById('question-language').value;
+            const textEn = document.getElementById('question-text-en').value;
+            const textUr = document.getElementById('question-text-urdu').value;
+            const marks = document.getElementById('question-marks').value;
+            const chapter = document.getElementById('question-chapter').value;
+            const answer = document.getElementById('question-answer').value;
+            
+            let options = null;
+            if (type === 'mcq') {
+                const optionsInput = document.getElementById('question-options').value;
+                options = optionsInput.split(',').map(opt => opt.trim());
+            }
+            
+            // Add question to bank
+            questionBank.push({
+                id: `${subject.substring(0, 3).toUpperCase()}${questionBank.length + 1}`,
+                textEn: textEn,
+                textUr: textUr,
+                type: type,
+                subject: subject,
+                marks: marks,
+                chapter: chapter,
+                answer: answer,
+                options: options
+            });
+            
+            counters.questions++;
+            updateAllCounters();
+            updateQuestionBank();
+            
+            addActivity('Added new question', subject);
+            alert('Question added successfully!');
+            this.reset();
+        });
+
+        paperForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            counters.papers++;
+            updateAllCounters();
+            
+            // Get form values
+            const subject = document.getElementById('paper-subject-input').value;
+            const titleInput = document.getElementById('paper-title-input');
+            const title = titleInput.value;
+            const languageSelect = document.getElementById('paper-language');
+            const language = languageSelect.value;
+            const marksInput = document.getElementById('paper-marks');
+            const marks = marksInput.value;
+            const timeInput = document.getElementById('paper-time');
+            const time = timeInput.value;
+            const instructionsInput = document.getElementById('paper-instructions');
+            const instructions = instructionsInput.value;
+            
+            // Update paper details
+            if (title) {
+                paperTitle.textContent = title;
+                document.getElementById('print-paper-title').textContent = title;
+            }
+            
+            if (subject) {
+                document.getElementById('paper-subject').textContent = `Subject: ${subject}`;
+                document.getElementById('print-paper-subject').textContent = `Subject: ${subject}`;
+            }
+            
+            if (marks && time) {
+                document.getElementById('paper-details').textContent = `Time Allowed: ${time} | Total Marks: ${marks}`;
+                document.getElementById('print-paper-details').textContent = `Time Allowed: ${time} | Total Marks: ${marks}`;
+            }
+            
+            if (instructions) {
+                document.getElementById('paper-instructions-display').textContent = instructions;
+                document.getElementById('print-paper-instructions').textContent = instructions;
+            }
+            
+            // Generate questions based on selected language
+            generatePaperQuestions(language);
+            
+            addActivity('Generated exam paper', subject);
+            alert('Exam paper generated successfully! Scroll down to view.');
+        });
+
+        // Initialize the application
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log('EduVault Exam Management System initialized');
+        });
+    </script>
+</body>
+</html>
